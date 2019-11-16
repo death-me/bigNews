@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>大事件-后台登录页</title>
+  <link rel="stylesheet" type="text/css" href="css/reset.css" />
+  <link rel="stylesheet" type="text/css" href="css/iconfont.css" />
+  <link rel="stylesheet" type="text/css" href="css/main.css" />
+  <!-- 引入bootstrap的css文件 -->
+  <link rel="stylesheet" href="./libs/bootstrap/css/bootstrap.min.css" />
+  <!-- 引入jq文件 -->
+  <script src="./libs/jquery-1.12.4.min.js"></script>
+  <!-- 引入bootstrap的js文件 -->
+  <script src="./libs/bootstrap/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+  <div class="main_wrap">
+    <div class="header">
+      <a href="#" class="logo"><img src="images/logo.png" alt="" /></a>
+      <div class="copyright">
+        CopyRight © 2019 深圳百秀信息技术股份有限公司<br />All Rights Reserved
+      </div>
+    </div>
+
+    <div class="login_form_con">
+      <div class="login_title"></div>
+      <form class="login_form" action="https://www.baidu.com">
+        <i class="iconfont icon-user"></i>
+        <i class="iconfont icon-key"></i>
+        <input type="text" class="input_txt" placeholder="邮箱/手机号" />
+        <input type="password" class="input_pass" placeholder="密码" />
+        <input type="submit" class="input_sub" value="登 录" />
+      </form>
+    </div>
+  </div>
+
+
+  <!-- 使用bootstrap的模态框 -->
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">温馨提示!</h4>
+        </div>
+        <div class="modal-body">
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" data-dismiss="modal">确认</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./libs/http.js"></script>
+  <script>
+    //入口函数
+    $(function () {
+      //一:登录需求:
+      //1.给登录按钮设置一个点击事件
+      $('.input_sub').on('click', function (e) {
+        e.preventDefault();
+        //2.获取用户输入的用户名和密码
+        var username = $('.input_txt').val().trim();
+        var password = $('.input_pass').val().trim();
+        //3.判断非空
+        if (username == "" || password == "") {
+          // alert('账号和密码不能为空!');
+          $('#myModal .modal-body').text('账号和密码不能为空!');
+          $('#myModal').modal();
+          return;
+        }
+        //3.发送ajax请求,完成登录
+        $.ajax({
+          type: 'post',
+          //接口地址从window对象中的BigNew对象中获取. 
+          url: window.BigNew.user_login,
+          data: {
+            username: username,
+            password: password
+          },
+          success: function (backData) {
+            console.log(backData);
+            $('#myModal .modal-body').text(backData.msg);
+            $('#myModal').modal();
+            if (backData.code == 200) {
+              //账号密码正确,会返回一个token,把他存在本地. 
+              window.localStorage.setItem('token', backData.token);
+
+              //此事件在模态框被隐藏（并且同时在 CSS 过渡效果完成）之后被触发。
+              $('#myModal').on('hidden.bs.modal', function (e) {
+                window.location.href = './index.html';
+              })
+            }
+          }
+        });
+
+      })
+    
+    
+    
+    })
+  </script>
+</body>
+
+</html>
